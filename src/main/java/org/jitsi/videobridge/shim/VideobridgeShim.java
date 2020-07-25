@@ -139,8 +139,14 @@ public class VideobridgeShim
                 continue;
             }
 
-            ChannelShim channelShim
+            ChannelShim channelShim = null;
+            try {
+                channelShim
                     = contentShim.getOrCreateChannelShim(channelIq);
+            } catch (EndpointNotFoundException epnfX) {
+                logger.error(epnfX.getMessage());
+                continue;
+            }
             if (channelShim == null)
             {
                 // A channel expire request which was handled successfully.

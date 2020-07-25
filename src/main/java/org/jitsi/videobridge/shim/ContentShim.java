@@ -125,14 +125,19 @@ public class ContentShim
      * @return the created channel.
      */
     private ChannelShim createRtpChannel(String endpointId)
+            throws EndpointNotFoundException
     {
         synchronized (channels)
         {
             String channelId = generateUniqueChannelID();
 
+            Endpoint localEndpoint = conference.getLocalEndpoint(endpointId);
+            if (null==localEndpoint) {
+                throw new EndpointNotFoundException(endpointId);
+            }
             ChannelShim channelShim = new ChannelShim(
                 channelId,
-                conference.getLocalEndpoint(endpointId),
+                localEndpoint,
                 localSsrc,
                 this,
                 logger
@@ -241,7 +246,8 @@ public class ContentShim
      */
     ChannelShim getOrCreateChannelShim(
             ColibriConferenceIQ.Channel channelIq)
-            throws VideobridgeShim.IqProcessingException
+            throws VideobridgeShim.IqProcessingException, 
+            EndpointNotFoundException
     {
         String channelId = channelIq.getID();
         int channelExpire = channelIq.getExpire();
